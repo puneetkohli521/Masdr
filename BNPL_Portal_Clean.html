@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNPL SME Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .nav-tab:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-role-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-nbfc-review {
+            background: rgba(147, 51, 234, 0.2);
+            color: #9333ea;
+        }
+
+        .status-anchor-review {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+        }
+
+        .limit-warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        /* Simple Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .nav-tabs {
+                justify-content: center;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">BNPL SME Portal</div>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showTab('dashboard')">Dashboard</div>
+                <div class="nav-tab" onclick="showTab('transactions')">Transactions</div>
+                <div class="nav-tab" onclick="showTab('invoices')">Invoices</div>
+                <div class="nav-tab" onclick="showTab('profile')">Profile</div>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div>
+                    <div>Ahmed Al-Rashid</div>
+                    <div class="user-role-badge">General User</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content">
+                <div class="section-title">SME Dashboard</div>
+                
+                <!-- Credit Limit Warning -->
+                <div class="limit-warning">
+                    ⚠️ <strong>Credit Limit Alert:</strong> You're using 43% of your credit limit
+                </div>
+                
+                <!-- Dashboard Stats -->
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">SAR 500,000</div>
+                        <div class="stat-label">Total Credit Limit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">SAR 285,000</div>
+                        <div class="stat-label">Available Credit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">SAR 215,000</div>
+                        <div class="stat-label">Outstanding Balance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Pending Transactions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5.0%</div>
+                        <div class="stat-label">Discount Rate</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="openModal('transactionModal')">
+                        💰 Create New Transaction
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('invoiceModal')">
+                        📄 Add Invoice
+                    </button>
+                    <button class="btn btn-secondary" onclick="alert('Export functionality would be implemented here')">
+                        📊 Export Data
+                    </button>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Invoice Count</th>
+                                <th>Total Amount</th>
+                                <th>Loan Amount</th>
+                                <th>Date Created</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TXN-001</td>
+                                <td>2</td>
+                                <td>SAR 85,000</td>
+                                <td>SAR 80,750</td>
+                                <td>2025-08-01</td>
+                                <td><span class="status-badge status-nbfc-review">NBFC Review</span></td>
+                                <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>TXN-002</td>
+                                <td>1</td>
+                                <td>SAR 65,000</td>
+                                <td>SAR 61,750</td>
+                                <td>2025-07-28</td>
+                                <td><span class="status-badge status-anchor-review">Anchor Review</span></td>
+                                <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>TXN-003</td>
+                                <td>3</td>
+                                <td>SAR 120,000</td>
+                                <td>SAR 114,000</td>
+                                <td>2025-07-25</td>
+                                <td><span class="status-badge status-approved">Approved</span></td>
+                                <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Other tabs (hidden by default) -->
+            <div id="transactions" class="tab-content hidden">
+                <div class="section-title">Transaction Queues</div>
+                <p>Transaction management functionality...</p>
+            </div>
+
+            <div id="invoices" class="tab-content hidden">
+                <div class="section-title">Invoice Management</div>
+                <p>Invoice management functionality...</p>
+            </div>
+
+            <div id="profile" class="tab-content hidden">
+                <div class="section-title">Company Profile</div>
+                <p>Profile management functionality...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('transactionModal')">&times;</button>
+            <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
+            <form onsubmit="handleTransactionSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Requested Amount (SAR)</label>
+                    <input type="number" class="form-input" required min="5000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Business Purpose</label>
+                    <select class="form-select" required>
+                        <option value="">Select Purpose</option>
+                        <option value="working_capital">Working Capital</option>
+                        <option value="inventory">Inventory Purchase</option>
+                        <option value="expansion">Business Expansion</option>
+                        <option value="equipment">Equipment Purchase</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('transactionModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('invoiceModal')">&times;</button>
+            <h2 style="margin-bottom: 30px; color: #444;">Add New Invoice</h2>
+            <form onsubmit="handleInvoiceSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Invoice Number</label>
+                    <input type="text" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Anchor Company</label>
+                    <select class="form-select" required>
+                        <option value="">Select Anchor</option>
+                        <option value="SUIC">SUIC</option>
+                        <option value="Tawuniya">Tawuniya</option>
+                        <option value="SAICO">SAICO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Amount (SAR)</label>
+                    <input type="number" class="form-input" required min="1000">
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('invoiceModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Simple tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.remove('hidden');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+
+        // Simple modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Form handlers
+        function handleTransactionSubmit(event) {
+            event.preventDefault();
+            alert('Transaction created successfully!');
+            closeModal('transactionModal');
+        }
+
+        function handleInvoiceSubmit(event) {
+            event.preventDefault();
+            alert('Invoice added successfully!');
+            closeModal('invoiceModal');
+        }
+
+        // Close modals with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -450,7 +450,7 @@
         }
     </style>
 </head>
-<body x-data="smeApp()">
+<body x-data="smeApp()" x-init="init()">
     <div class="container">
         <div class="header">
             <div class="logo">BNPL SME Portal</div>
@@ -916,12 +916,17 @@
     <script>
         function smeApp() {
             return {
+                init() {
+                    // Ensure all modals are closed on page load
+                    this.resetAllModals();
+                    console.log('SME App initialized successfully');
+                },
                 currentTab: 'dashboard',
                 currentUser: {
                     id: 'user-001',
                     name: 'Ahmed Al-Rashid',
-                    role: 'super',
-                    roleDisplay: 'Super User',
+                    role: 'general',
+                    roleDisplay: 'General User',
                     email: 'ahmed.rashid@alrashidauto.com'
                 },
                 
@@ -1084,6 +1089,12 @@
                     setTimeout(() => {
                         this.showAlert = false;
                     }, 3000);
+                },
+
+                resetAllModals() {
+                    this.showNewTransactionModal = false;
+                    this.showAddInvoiceModal = false;
+                    this.showAddUserModal = false;
                 },
 
                 createTransaction() {

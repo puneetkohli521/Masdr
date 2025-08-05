@@ -422,6 +422,10 @@
             display: none;
         }
 
+        [x-cloak] {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -678,9 +682,16 @@
                         <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 12px; padding: 20px;">
                             <p><strong>Current Discount Rate:</strong> <span x-text="smeData.discountRate + '%'"></span></p>
                             <p style="color: #666; font-size: 14px; margin-top: 10px;">This rate is applied to all your transactions</p>
-                            <button class="btn btn-primary" style="margin-top: 15px;" @click="updateDiscountRate()">
-                                Update Rate
-                            </button>
+                            <template x-if="currentUser.role === 'super'">
+                                <button class="btn btn-primary" style="margin-top: 15px;" @click="updateDiscountRate()">
+                                    Update Rate
+                                </button>
+                            </template>
+                            <template x-if="currentUser.role !== 'super'">
+                                <p style="color: #666; font-size: 12px; margin-top: 15px; font-style: italic;">
+                                    Only Super Users can modify discount rates
+                                </p>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -741,8 +752,8 @@
     </div>
 
     <!-- New Transaction Modal -->
-    <div x-show="showNewTransactionModal" x-transition style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;" :style="showNewTransactionModal ? 'display: flex !important' : 'display: none'">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
+    <div x-show="showNewTransactionModal" x-transition class="modal-overlay" x-cloak>
+        <div class="modal-dialog">
             <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
             <form @submit.prevent="createTransaction()">
                 <div class="form-group">
@@ -790,8 +801,8 @@
     </div>
 
     <!-- Add Invoice Modal -->
-    <div x-show="showAddInvoiceModal" x-transition style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;" :style="showAddInvoiceModal ? 'display: flex !important' : 'display: none'">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+    <div x-show="showAddInvoiceModal" x-transition class="modal-overlay" x-cloak>
+        <div class="modal-dialog" style="max-width: 600px;">
             <h2 style="margin-bottom: 30px; color: #444;">Add New Invoice</h2>
             <form @submit.prevent="addInvoice()">
                 <div class="grid-2">
@@ -860,8 +871,8 @@
     </div>
 
     <!-- Add User Modal -->
-    <div x-show="showAddUserModal" x-transition style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;" :style="showAddUserModal ? 'display: flex !important' : 'display: none'">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+    <div x-show="showAddUserModal" x-transition class="modal-overlay" x-cloak>
+        <div class="modal-dialog" style="max-width: 600px;">
             <h2 style="margin-bottom: 30px; color: #444;">Add New User</h2>
             <form @submit.prevent="addUser()">
                 <div class="grid-2">

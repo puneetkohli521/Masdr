@@ -1148,9 +1148,6 @@
                     this.showNewTransactionModal = false;
                     this.newTransaction = { selectedInvoices: [], requestedAmount: '', businessPurpose: '', additionalInfo: '' };
                     this.showAlertMessage('Transaction created successfully!');
-                    
-                    // Switch to Transactions tab to show the result
-                    this.currentTab = 'transactions';
                 },
 
                 addInvoice() {
@@ -1183,9 +1180,6 @@
                     this.showAddInvoiceModal = false;
                     this.newInvoice = { number: '', anchor: '', amount: '', date: '', dueDate: '', repaymentPeriod: '60', description: '' };
                     this.showAlertMessage('Invoice added successfully!');
-                    
-                    // Switch to Invoices tab to show the result
-                    this.currentTab = 'invoices';
                 },
 
                 addUser() {
@@ -1210,11 +1204,6 @@
                     this.showAddUserModal = false;
                     this.newUser = { name: '', email: '', phone: '', role: '' };
                     this.showAlertMessage('User added successfully!');
-                    
-                    // Switch to Users tab to show the result
-                    if (this.currentUser.role === 'super') {
-                        this.currentTab = 'users';
-                    }
                 },
 
                 viewTransactionDetails(transactionId) {

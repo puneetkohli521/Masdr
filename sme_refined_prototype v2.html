@@ -545,6 +545,217 @@
                                                 Cancel
                                             </button>
                                         </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div x-show="currentTab === 'transactions'">
+                <div class="section-title">Transaction Queues</div>
+                
+                <!-- Queue Filters -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px;">Filter by Queue:</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <template x-for="filter in transactionFilters" :key="filter.key">
+                            <button class="btn" :class="transactionFilter === filter.key ? 'btn-primary' : 'btn-secondary'" @click="transactionFilter = filter.key" x-text="filter.label"></button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Filtered Transactions -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Invoice Count</th>
+                                <th>Total Amount</th>
+                                <th>Loan Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="transaction in filteredTransactions" :key="transaction.id">
+                                <tr>
+                                    <td x-text="transaction.id"></td>
+                                    <td x-text="transaction.invoiceCount"></td>
+                                    <td x-text="formatCurrency(transaction.totalAmount)"></td>
+                                    <td x-text="formatCurrency(transaction.loanAmount)"></td>
+                                    <td>
+                                        <span class="status-badge" :class="getStatusClass(transaction.status)" x-text="transaction.status"></span>
+                                    </td>
+                                    <td x-text="transaction.dateCreated"></td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="viewTransactionDetails(transaction.id)">Details</button>
+                                        <template x-if="transaction.status === 'Pending'">
+                                            <button class="btn btn-warning" style="padding: 6px 12px; font-size: 14px; margin-left: 8px;" @click="editTransaction(transaction.id)">Edit</button>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Invoices Tab -->
+            <div x-show="currentTab === 'invoices'">
+                <div class="section-title">Invoice Management</div>
+                
+                <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                    <button class="btn btn-primary" @click="showAddInvoiceModal = true">
+                        📄 Add New Invoice
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Anchor</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Transaction</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="invoice in invoices" :key="invoice.id">
+                                <tr>
+                                    <td x-text="invoice.number"></td>
+                                    <td x-text="invoice.anchor"></td>
+                                    <td x-text="formatCurrency(invoice.amount)"></td>
+                                    <td x-text="invoice.date"></td>
+                                    <td x-text="invoice.dueDate"></td>
+                                    <td>
+                                        <span class="status-badge" :class="getStatusClass(invoice.status)" x-text="invoice.status"></span>
+                                    </td>
+                                    <td x-text="invoice.transactionId || 'None'"></td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="viewInvoice(invoice.id)">View</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div x-show="currentTab === 'profile'">
+                <div class="section-title">Company Profile</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <div>
+                        <h3 style="margin-bottom: 20px;">Company Information</h3>
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
+                            <p><strong>Company Name:</strong> <span x-text="companyProfile.name"></span></p>
+                            <p><strong>CR Number:</strong> <span x-text="companyProfile.cr"></span></p>
+                            <p><strong>VAT Number:</strong> <span x-text="companyProfile.vat"></span></p>
+                            <p><strong>Sector:</strong> <span x-text="companyProfile.sector"></span></p>
+                        </div>
+                        
+                        <h3 style="margin: 30px 0 20px 0;">NBFC Contract</h3>
+                        <div class="alert alert-success">
+                            <strong>Contract Status:</strong> Active<br>
+                            <strong>Contract Date:</strong> January 15, 2025<br>
+                            <strong>Next Review:</strong> January 15, 2026
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 style="margin-bottom: 20px;">Discount Configuration</h3>
+                        <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 12px; padding: 20px;">
+                            <p><strong>Current Discount Rate:</strong> <span x-text="smeData.discountRate + '%'"></span></p>
+                            <p style="color: #666; font-size: 14px; margin-top: 10px;">This rate is applied to all your transactions</p>
+                            <button class="btn btn-primary" style="margin-top: 15px;" @click="updateDiscountRate()">
+                                Update Rate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab (Super User Only) -->
+            <div x-show="currentTab === 'users' && currentUser.role === 'super'">
+                <div class="section-title">User Management</div>
+                
+                <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                    <button class="btn btn-primary" @click="showAddUserModal = true">
+                        👤 Add New User
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="user in companyUsers" :key="user.id">
+                                <tr>
+                                    <td x-text="user.name"></td>
+                                    <td x-text="user.email"></td>
+                                    <td>
+                                        <span class="user-role-badge" :class="user.role === 'super' ? 'role-super' : 'role-general'" x-text="user.roleDisplay"></span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge" :class="user.status === 'active' ? 'status-approved' : 'status-pending'" x-text="user.status"></span>
+                                    </td>
+                                    <td x-text="user.lastLogin"></td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="editUser(user.id)">Edit</button>
+                                        <template x-if="user.status === 'active' && user.id !== currentUser.id">
+                                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 14px; margin-left: 8px;" @click="deactivateUser(user.id)">Deactivate</button>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div x-show="showAlert" x-transition style="position: fixed; top: 20px; right: 20px; z-index: 1001; width: 300px;" class="alert alert-success">
+        <span x-text="alertMessage"></span>
+    </div>
+
+    <!-- New Transaction Modal -->
+    <div x-show="showNewTransactionModal" x-transition style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;" :style="showNewTransactionModal ? 'display: flex !important' : 'display: none'">
+        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
+            <form @submit.prevent="createTransaction()">
+                <div class="form-group">
+                    <label class="form-label">Select Invoices for Transaction</label>
+                    <div style="border: 2px solid #e1e8f0; border-radius: 12px; padding: 20px; max-height: 200px; overflow-y: auto;">
+                        <template x-for="invoice in availableInvoices" :key="invoice.id">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="checkbox" :id="'invoice-' + invoice.id" x-model="newTransaction.selectedInvoices" :value="invoice.id" style="margin-right: 10px;">
+                                <label :for="'invoice-' + invoice.id" style="flex: 1; cursor: pointer;">
+                                    <span x-text="invoice.number"></span> - <span x-text="formatCurrency(invoice.amount)"></span> (<span x-text="invoice.anchor"></span>)
+                                </label>
+                            </div>
+                        </template>
                     </div>
                 </div>
 
@@ -1042,214 +1253,3 @@
     </script>
 </body>
 </html>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Transactions Tab -->
-            <div x-show="currentTab === 'transactions'">
-                <div class="section-title">Transaction Queues</div>
-                
-                <!-- Queue Filters -->
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 15px;">Filter by Queue:</h3>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <template x-for="filter in transactionFilters" :key="filter.key">
-                            <button class="btn" :class="transactionFilter === filter.key ? 'btn-primary' : 'btn-secondary'" @click="transactionFilter = filter.key" x-text="filter.label"></button>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Filtered Transactions -->
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Transaction ID</th>
-                                <th>Invoice Count</th>
-                                <th>Total Amount</th>
-                                <th>Loan Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template x-for="transaction in filteredTransactions" :key="transaction.id">
-                                <tr>
-                                    <td x-text="transaction.id"></td>
-                                    <td x-text="transaction.invoiceCount"></td>
-                                    <td x-text="formatCurrency(transaction.totalAmount)"></td>
-                                    <td x-text="formatCurrency(transaction.loanAmount)"></td>
-                                    <td>
-                                        <span class="status-badge" :class="getStatusClass(transaction.status)" x-text="transaction.status"></span>
-                                    </td>
-                                    <td x-text="transaction.dateCreated"></td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="viewTransactionDetails(transaction.id)">Details</button>
-                                        <template x-if="transaction.status === 'Pending'">
-                                            <button class="btn btn-warning" style="padding: 6px 12px; font-size: 14px; margin-left: 8px;" @click="editTransaction(transaction.id)">Edit</button>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Invoices Tab -->
-            <div x-show="currentTab === 'invoices'">
-                <div class="section-title">Invoice Management</div>
-                
-                <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                    <button class="btn btn-primary" @click="showAddInvoiceModal = true">
-                        📄 Add New Invoice
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Invoice #</th>
-                                <th>Anchor</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                                <th>Transaction</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template x-for="invoice in invoices" :key="invoice.id">
-                                <tr>
-                                    <td x-text="invoice.number"></td>
-                                    <td x-text="invoice.anchor"></td>
-                                    <td x-text="formatCurrency(invoice.amount)"></td>
-                                    <td x-text="invoice.date"></td>
-                                    <td x-text="invoice.dueDate"></td>
-                                    <td>
-                                        <span class="status-badge" :class="getStatusClass(invoice.status)" x-text="invoice.status"></span>
-                                    </td>
-                                    <td x-text="invoice.transactionId || 'None'"></td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="viewInvoice(invoice.id)">View</button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Profile Tab -->
-            <div x-show="currentTab === 'profile'">
-                <div class="section-title">Company Profile</div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-                    <div>
-                        <h3 style="margin-bottom: 20px;">Company Information</h3>
-                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
-                            <p><strong>Company Name:</strong> <span x-text="companyProfile.name"></span></p>
-                            <p><strong>CR Number:</strong> <span x-text="companyProfile.cr"></span></p>
-                            <p><strong>VAT Number:</strong> <span x-text="companyProfile.vat"></span></p>
-                            <p><strong>Sector:</strong> <span x-text="companyProfile.sector"></span></p>
-                        </div>
-                        
-                        <h3 style="margin: 30px 0 20px 0;">NBFC Contract</h3>
-                        <div class="alert alert-success">
-                            <strong>Contract Status:</strong> Active<br>
-                            <strong>Contract Date:</strong> January 15, 2025<br>
-                            <strong>Next Review:</strong> January 15, 2026
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h3 style="margin-bottom: 20px;">Discount Configuration</h3>
-                        <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 12px; padding: 20px;">
-                            <p><strong>Current Discount Rate:</strong> <span x-text="smeData.discountRate + '%'"></span></p>
-                            <p style="color: #666; font-size: 14px; margin-top: 10px;">This rate is applied to all your transactions</p>
-                            <button class="btn btn-primary" style="margin-top: 15px;" @click="updateDiscountRate()">
-                                Update Rate
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Users Tab (Super User Only) -->
-            <div x-show="currentTab === 'users' && currentUser.role === 'super'">
-                <div class="section-title">User Management</div>
-                
-                <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                    <button class="btn btn-primary" @click="showAddUserModal = true">
-                        👤 Add New User
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Last Login</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template x-for="user in companyUsers" :key="user.id">
-                                <tr>
-                                    <td x-text="user.name"></td>
-                                    <td x-text="user.email"></td>
-                                    <td>
-                                        <span class="user-role-badge" :class="user.role === 'super' ? 'role-super' : 'role-general'" x-text="user.roleDisplay"></span>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge" :class="user.status === 'active' ? 'status-approved' : 'status-pending'" x-text="user.status"></span>
-                                    </td>
-                                    <td x-text="user.lastLogin"></td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" @click="editUser(user.id)">Edit</button>
-                                        <template x-if="user.status === 'active' && user.id !== currentUser.id">
-                                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 14px; margin-left: 8px;" @click="deactivateUser(user.id)">Deactivate</button>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Alert -->
-    <div x-show="showAlert" x-transition style="position: fixed; top: 20px; right: 20px; z-index: 1001; width: 300px;" class="alert alert-success">
-        <span x-text="alertMessage"></span>
-    </div>
-
-    <!-- New Transaction Modal -->
-    <div x-show="showNewTransactionModal" x-transition style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;" :style="showNewTransactionModal ? 'display: flex !important' : 'display: none'">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
-            <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
-            <form @submit.prevent="createTransaction()">
-                <div class="form-group">
-                    <label class="form-label">Select Invoices for Transaction</label>
-                    <div style="border: 2px solid #e1e8f0; border-radius: 12px; padding: 20px; max-height: 200px; overflow-y: auto;">
-                        <template x-for="invoice in availableInvoices" :key="invoice.id">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <input type="checkbox" :id="'invoice-' + invoice.id" x-model="newTransaction.selectedInvoices" :value="invoice.id" style="margin-right: 10px;">
-                                <label :for="'invoice-' + invoice.id" style="flex: 1; cursor: pointer;">
-                                    <span x-text="invoice.number"></span> - <span x-text="formatCurrency(invoice.amount)"></span> (<span x-text="invoice.anchor"></span>)
-                                </label>
-                            </div>
-                        </template>

@@ -450,7 +450,7 @@
         }
     </style>
 </head>
-<body x-data="smeApp()">
+<body x-data="smeApp()" x-init="init()" @keydown.escape="resetAllModals()">
     <div class="container">
         <div class="header">
             <div class="logo">BNPL SME Portal</div>
@@ -464,6 +464,9 @@
             </div>
 
             <div class="user-info">
+                <button class="btn btn-danger" @click="resetAllModals()" style="padding: 8px 12px; font-size: 12px; margin-right: 15px;">
+                    ✕ Close All
+                </button>
                 <div class="user-avatar" x-text="currentUser.name.charAt(0)"></div>
                 <div>
                     <div x-text="currentUser.name"></div>
@@ -916,12 +919,22 @@
     <script>
         function smeApp() {
             return {
+                init() {
+                    // Ensure all modals are closed on page load
+                    this.resetAllModals();
+                    console.log('SME App initialized successfully');
+                    console.log('Modal states:', {
+                        showNewTransactionModal: this.showNewTransactionModal,
+                        showAddInvoiceModal: this.showAddInvoiceModal,
+                        showAddUserModal: this.showAddUserModal
+                    });
+                },
                 currentTab: 'dashboard',
                 currentUser: {
                     id: 'user-001',
                     name: 'Ahmed Al-Rashid',
-                    role: 'super',
-                    roleDisplay: 'Super User',
+                    role: 'general',
+                    roleDisplay: 'General User',
                     email: 'ahmed.rashid@alrashidauto.com'
                 },
                 
@@ -1084,6 +1097,12 @@
                     setTimeout(() => {
                         this.showAlert = false;
                     }, 3000);
+                },
+
+                resetAllModals() {
+                    this.showNewTransactionModal = false;
+                    this.showAddInvoiceModal = false;
+                    this.showAddUserModal = false;
                 },
 
                 createTransaction() {

@@ -199,6 +199,42 @@
         .btn-secondary:hover {
             background: #667eea;
             color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-success:hover, .btn-danger:hover, .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .table-container {
@@ -360,6 +396,49 @@
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            color: white;
         }
 
         .hidden {
@@ -707,19 +786,45 @@
             <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
             <form onsubmit="handleTransactionSubmit(event)">
                 <div class="form-group">
-                    <label class="form-label">Requested Amount (SAR)</label>
-                    <input type="number" class="form-input" required min="5000">
+                    <label class="form-label">Select Invoices for Transaction</label>
+                    <div style="border: 2px solid #e1e8f0; border-radius: 12px; padding: 20px; max-height: 200px; overflow-y: auto;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="invoice-1" value="INV-2025-004" style="margin-right: 10px;">
+                            <label for="invoice-1" style="flex: 1; cursor: pointer;">
+                                INV-2025-004 - SAR 55,000 (SAICO)
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="invoice-2" value="INV-2025-005" style="margin-right: 10px;">
+                            <label for="invoice-2" style="flex: 1; cursor: pointer;">
+                                INV-2025-005 - SAR 75,000 (Tawuniya)
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Requested Amount (SAR)</label>
+                        <input type="number" class="form-input" required min="5000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Purpose</label>
+                        <select class="form-select" required>
+                            <option value="">Select Purpose</option>
+                            <option value="working_capital">Working Capital</option>
+                            <option value="inventory">Inventory Purchase</option>
+                            <option value="expansion">Business Expansion</option>
+                            <option value="equipment">Equipment Purchase</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label class="form-label">Business Purpose</label>
-                    <select class="form-select" required>
-                        <option value="">Select Purpose</option>
-                        <option value="working_capital">Working Capital</option>
-                        <option value="inventory">Inventory Purchase</option>
-                        <option value="expansion">Business Expansion</option>
-                        <option value="equipment">Equipment Purchase</option>
-                    </select>
+                    <label class="form-label">Additional Information</label>
+                    <textarea class="form-textarea" placeholder="Any additional context or information"></textarea>
                 </div>
+
                 <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('transactionModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Create Transaction</button>
@@ -734,23 +839,63 @@
             <button class="modal-close" onclick="closeModal('invoiceModal')">&times;</button>
             <h2 style="margin-bottom: 30px; color: #444;">Add New Invoice</h2>
             <form onsubmit="handleInvoiceSubmit(event)">
-                <div class="form-group">
-                    <label class="form-label">Invoice Number</label>
-                    <input type="text" class="form-input" required>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Invoice Number</label>
+                        <input type="text" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Anchor Company</label>
+                        <select class="form-select" required>
+                            <option value="">Select Anchor</option>
+                            <option value="SUIC">SUIC</option>
+                            <option value="Tawuniya">Tawuniya</option>
+                            <option value="SAICO">SAICO</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Anchor Company</label>
-                    <select class="form-select" required>
-                        <option value="">Select Anchor</option>
-                        <option value="SUIC">SUIC</option>
-                        <option value="Tawuniya">Tawuniya</option>
-                        <option value="SAICO">SAICO</option>
-                    </select>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Invoice Amount (SAR)</label>
+                        <input type="number" class="form-input" required min="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Date</label>
+                        <input type="date" class="form-input" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Invoice Amount (SAR)</label>
-                    <input type="number" class="form-input" required min="1000">
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Repayment Period</label>
+                        <select class="form-select" required>
+                            <option value="30">30 days</option>
+                            <option value="60">60 days</option>
+                            <option value="90">90 days</option>
+                            <option value="120">120 days</option>
+                        </select>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" placeholder="Invoice description and details"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload Invoice Document</label>
+                    <div class="file-upload-area" onclick="alert('File upload functionality would be implemented here')">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
+                        <div>Click to upload or drag and drop</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 10px;">PDF files only, max 10MB</div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('invoiceModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Invoice</button>
@@ -761,6 +906,63 @@
 
     <script>
         console.log('BNPL Portal Final - JavaScript Loading...');
+
+        // Alert system
+        let alertTimeout;
+        
+        function showAlert(message, type = 'success') {
+            // Clear existing timeout
+            if (alertTimeout) {
+                clearTimeout(alertTimeout);
+            }
+            
+            // Create or update alert
+            let alertDiv = document.getElementById('floating-alert');
+            if (!alertDiv) {
+                alertDiv = document.createElement('div');
+                alertDiv.id = 'floating-alert';
+                alertDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10001;
+                    width: 300px;
+                    padding: 16px 20px;
+                    border-radius: 12px;
+                    border-left: 4px solid;
+                    font-weight: 500;
+                    opacity: 0;
+                    transform: translateX(100%);
+                    transition: all 0.3s ease;
+                `;
+                document.body.appendChild(alertDiv);
+            }
+            
+            // Set alert style based on type
+            if (type === 'success') {
+                alertDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+                alertDiv.style.borderColor = '#10b981';
+                alertDiv.style.color = '#065f46';
+            } else if (type === 'error') {
+                alertDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+                alertDiv.style.borderColor = '#ef4444';
+                alertDiv.style.color = '#991b1b';
+            }
+            
+            alertDiv.textContent = message;
+            
+            // Show alert
+            setTimeout(() => {
+                alertDiv.style.opacity = '1';
+                alertDiv.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Hide alert after 3 seconds
+            alertTimeout = setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.style.transform = 'translateX(100%)';
+            }, 3000);
+        }
 
         // Simple tab switching
         function showTab(tabName) {
@@ -806,15 +1008,63 @@
         function handleTransactionSubmit(event) {
             event.preventDefault();
             console.log('Transaction form submitted');
-            alert('Transaction created successfully!');
-            closeModal('transactionModal');
+            
+            // Get selected invoices
+            const selectedInvoices = Array.from(document.querySelectorAll('#transactionModal input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedInvoices.length === 0) {
+                showAlert('Please select at least one invoice for the transaction.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            // Simulate form processing
+            setTimeout(() => {
+                showAlert('Transaction created successfully! ID: TXN-' + Math.floor(Math.random() * 1000));
+                closeModal('transactionModal');
+                
+                // Reset form and button
+                document.querySelector('#transactionModal form').reset();
+                document.querySelectorAll('#transactionModal input[type="checkbox"]').forEach(cb => cb.checked = false);
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }, 1500);
         }
 
         function handleInvoiceSubmit(event) {
             event.preventDefault();
             console.log('Invoice form submitted');
-            alert('Invoice added successfully!');
-            closeModal('invoiceModal');
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const invoiceNumber = event.target.querySelector('input[type="text"]').value;
+            
+            if (!invoiceNumber) {
+                showAlert('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            // Simulate form processing
+            setTimeout(() => {
+                showAlert(`Invoice ${invoiceNumber} added successfully!`);
+                closeModal('invoiceModal');
+                
+                // Reset form and button
+                event.target.reset();
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }, 1500);
         }
 
         // Close modals with ESC key

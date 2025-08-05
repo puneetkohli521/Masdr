@@ -1087,8 +1087,15 @@
                 },
 
                 createTransaction() {
+                    console.log('createTransaction called with:', this.newTransaction);
+                    
                     if (this.newTransaction.selectedInvoices.length === 0) {
                         alert('Please select at least one invoice for the transaction.');
+                        return;
+                    }
+
+                    if (!this.newTransaction.requestedAmount || !this.newTransaction.businessPurpose) {
+                        alert('Please fill in all required fields');
                         return;
                     }
 
@@ -1141,9 +1148,19 @@
                     this.showNewTransactionModal = false;
                     this.newTransaction = { selectedInvoices: [], requestedAmount: '', businessPurpose: '', additionalInfo: '' };
                     this.showAlertMessage('Transaction created successfully!');
+                    
+                    // Switch to Transactions tab to show the result
+                    this.currentTab = 'transactions';
                 },
 
                 addInvoice() {
+                    console.log('addInvoice called with:', this.newInvoice);
+                    
+                    if (!this.newInvoice.number || !this.newInvoice.anchor || !this.newInvoice.amount || !this.newInvoice.date) {
+                        alert('Please fill in all required fields');
+                        return;
+                    }
+
                     // Calculate due date if not provided
                     if (!this.newInvoice.dueDate && this.newInvoice.date && this.newInvoice.repaymentPeriod) {
                         const invoiceDate = new Date(this.newInvoice.date);
@@ -1166,9 +1183,19 @@
                     this.showAddInvoiceModal = false;
                     this.newInvoice = { number: '', anchor: '', amount: '', date: '', dueDate: '', repaymentPeriod: '60', description: '' };
                     this.showAlertMessage('Invoice added successfully!');
+                    
+                    // Switch to Invoices tab to show the result
+                    this.currentTab = 'invoices';
                 },
 
                 addUser() {
+                    console.log('addUser called with:', this.newUser);
+                    
+                    if (!this.newUser.name || !this.newUser.email || !this.newUser.role) {
+                        alert('Please fill in all required fields');
+                        return;
+                    }
+
                     const newUser = {
                         id: 'user-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
                         name: this.newUser.name,
@@ -1183,6 +1210,11 @@
                     this.showAddUserModal = false;
                     this.newUser = { name: '', email: '', phone: '', role: '' };
                     this.showAlertMessage('User added successfully!');
+                    
+                    // Switch to Users tab to show the result
+                    if (this.currentUser.role === 'super') {
+                        this.currentTab = 'users';
+                    }
                 },
 
                 viewTransactionDetails(transactionId) {

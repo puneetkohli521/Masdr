@@ -330,28 +330,32 @@
 
         /* Modal Styles */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            backdrop-filter: blur(5px) !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
         }
 
         .modal-dialog {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideIn 0.3s ease;
+            background: white !important;
+            border-radius: 20px !important;
+            padding: 40px !important;
+            max-width: 800px !important;
+            width: 90% !important;
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+            animation: slideIn 0.3s ease !important;
+            position: relative !important;
+            z-index: 10000 !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
         }
 
         @keyframes fadeIn {
@@ -752,7 +756,7 @@
     </div>
 
     <!-- New Transaction Modal -->
-    <div x-show="showNewTransactionModal" x-transition class="modal-overlay" x-cloak>
+    <div x-show="showNewTransactionModal" x-transition class="modal-overlay" x-cloak @click.self="showNewTransactionModal = false">
         <div class="modal-dialog">
             <h2 style="margin-bottom: 30px; color: #444;">Create New Transaction</h2>
             <form @submit.prevent="createTransaction()">
@@ -801,7 +805,7 @@
     </div>
 
     <!-- Add Invoice Modal -->
-    <div x-show="showAddInvoiceModal" x-transition class="modal-overlay" x-cloak>
+    <div x-show="showAddInvoiceModal" x-transition class="modal-overlay" x-cloak @click.self="showAddInvoiceModal = false">
         <div class="modal-dialog" style="max-width: 600px;">
             <h2 style="margin-bottom: 30px; color: #444;">Add New Invoice</h2>
             <form @submit.prevent="addInvoice()">
@@ -871,7 +875,7 @@
     </div>
 
     <!-- Add User Modal -->
-    <div x-show="showAddUserModal" x-transition class="modal-overlay" x-cloak>
+    <div x-show="showAddUserModal" x-transition class="modal-overlay" x-cloak @click.self="showAddUserModal = false">
         <div class="modal-dialog" style="max-width: 600px;">
             <h2 style="margin-bottom: 30px; color: #444;">Add New User</h2>
             <form @submit.prevent="addUser()">
